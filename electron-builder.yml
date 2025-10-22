@@ -1,0 +1,35 @@
+appId: pe.edu.unheval.pausas-activas
+productName: Pausas Activas UNHEVAL
+copyright: © Universidad Nacional Hermilio Valdizán
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**/*
+  - assets/**/*
+  - node_modules/**/*
+  - "!**/*.ts"
+  - "!src/**/*"
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icons/icon.ico
+  publisherName: Universidad Nacional Hermilio Valdizán
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Pausas Activas UNHEVAL
+  installerIcon: build/icons/icon.ico
+  uninstallerIcon: build/icons/icon.ico
+  installerHeaderIcon: build/icons/icon.ico
+  deleteAppDataOnUninstall: false
+
+publish: null

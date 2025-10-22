@@ -1,0 +1,93 @@
+{
+  "name": "pausas-activas-unheval",
+  "version": "1.0.0",
+  "description": "Aplicación de escritorio para pausas activas - Universidad Nacional Hermilio Valdizán",
+  "main": "dist/main/main.js",
+  "homepage": "https://unheval.edu.pe",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leo10m2010/pausas-activas-unheval.git"
+  },
+  "author": {
+    "name": "Universidad Nacional Hermilio Valdizán",
+    "email": "comunicaciones@unheval.edu.pe"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev:renderer\" \"npm run dev:main\"",
+    "dev:main": "set ELECTRON_RENDERER_URL=http://localhost:3000 && tsc -p tsconfig.main.json && electron dist/main/main.js",
+    "dev:renderer": "vite",
+    "build": "npm run build:main && npm run build:renderer && npm run copy-assets",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:renderer": "vite build",
+    "copy-assets": "node copy-assets.js",
+    "dist": "npm run build && set CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder",
+    "dist:win": "npm run build && set CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder --win",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "@electron-toolkit/utils": "^4.0.0",
+    "@types/auto-launch": "^5.0.5",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "build": {
+    "appId": "pe.edu.unheval.pausas-activas",
+    "productName": "Pausas Activas UNHEVAL",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "asar": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "!assets/videos/README.md",
+      "!assets/videos/INSTRUCCIONES_VIDEOS.md",
+      "node_modules/**/*",
+      "!node_modules/**/test/**",
+      "!node_modules/**/tests/**"
+    ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icons/icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pausas Activas UNHEVAL",
+      "perMachine": false,
+      "allowElevation": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "leo10m2010",
+      "repo": "pausas-activas-unheval"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# Este archivo debe ser reemplazado por un archivo .ico real
+# Para generar el .ico desde el SVG, usar herramientas como:
+# - ImageMagick: convert logo-unheval.svg -resize 256x256 icon.ico
+# - Online converters
+# - Electron-builder puede generar automáticamente desde PNG
+
+# Por ahora, copiar manualmente un .ico válido aquí o usar electron-builder
+# para generar automáticamente desde assets/icons/logo-unheval.png
