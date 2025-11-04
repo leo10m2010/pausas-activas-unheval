@@ -87,7 +87,8 @@
       "target": "nsis",
       "icon": "build/icons/icon.png",
       "signAndEditExecutable": false,
-      "artifactName": "${productName}-${version}-Setup.${ext}"
+      "artifactName": "${productName}-${version}-Setup.${ext}",
+      "publisherName": "Universidad Nacional Hermilio Valdizán"
     },
     "nsis": {
       "oneClick": false,
@@ -103,8 +104,10 @@
       "menuCategory": "UNHEVAL",
       "runAfterFinish": true,
       "include": "build/installer.nsh",
-      "compression": "maximum",
-      "differentialPackage": true
+      "differentialPackage": true,
+      "installerIcon": "build/icons/icon.png",
+      "uninstallerIcon": "build/icons/icon.png",
+      "installerHeaderIcon": "build/icons/icon.png"
     },
     "publish": {
       "provider": "github",
