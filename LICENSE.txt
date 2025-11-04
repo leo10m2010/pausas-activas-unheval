@@ -1,0 +1,53 @@
+PAUSAS ACTIVAS UNHEVAL - Licencia de Uso
+
+Copyright (c) 2025 Universidad Nacional Hermilio Valdizán
+
+Este software es propiedad de la Universidad Nacional Hermilio Valdizán (UNHEVAL)
+y está destinado para uso interno de la institución.
+
+TÉRMINOS DE USO:
+
+1. Este software se proporciona "tal cual" para promover la salud y bienestar
+   de los trabajadores de UNHEVAL.
+
+2. Está permitido instalar y usar este software en equipos de UNHEVAL o
+   equipos personales de trabajadores de la universidad.
+
+3. No está permitida la redistribución comercial de este software.
+
+4. El software puede ser modificado para uso interno de UNHEVAL.
+
+5. UNHEVAL no se hace responsable por daños derivados del uso de este software.
+
+Para más información, contactar a:
+Oficina de TI - Universidad Nacional Hermilio Valdizán
+Email: soporte@unheval.edu.pe
+Web: https://unheval.edu.pe
+
+---
+
+PAUSAS ACTIVAS UNHEVAL - License Agreement
+
+Copyright (c) 2025 Universidad Nacional Hermilio Valdizán
+
+This software is property of Universidad Nacional Hermilio Valdizán (UNHEVAL)
+and is intended for internal use of the institution.
+
+TERMS OF USE:
+
+1. This software is provided "as is" to promote health and wellness
+   of UNHEVAL workers.
+
+2. Installation and use of this software is permitted on UNHEVAL equipment
+   or personal equipment of university workers.
+
+3. Commercial redistribution of this software is not permitted.
+
+4. The software may be modified for internal use by UNHEVAL.
+
+5. UNHEVAL is not responsible for damages arising from the use of this software.
+
+For more information, contact:
+IT Office - Universidad Nacional Hermilio Valdizán
+Email: soporte@unheval.edu.pe
+Web: https://unheval.edu.pe

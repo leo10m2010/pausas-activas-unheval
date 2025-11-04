@@ -98,6 +98,21 @@ const Player: React.FC<PlayerProps> = ({
     return `https://www.youtube.com/embed/${videoId}?autoplay=${isPlaying ? 1 : 0}&controls=1&rel=0&modestbranding=1`
   }
 
+  // Detectar tipo de video por extensión
+  const getVideoType = (src: string): string => {
+    const extension = src.split('.').pop()?.toLowerCase()
+    switch (extension) {
+      case 'webm':
+        return 'video/webm'
+      case 'mp4':
+        return 'video/mp4'
+      case 'ogg':
+        return 'video/ogg'
+      default:
+        return 'video/mp4' // Por defecto MP4
+    }
+  }
+
   if (isYouTube) {
     return (
       <div className="video-container">
@@ -130,7 +145,7 @@ const Player: React.FC<PlayerProps> = ({
           console.error('Error cargando video:', e)
         }}
       >
-        <source src={video.src} type="video/mp4" />
+        <source src={video.src} type={getVideoType(video.src)} />
         {video.subtitles && (
           <track
             kind="subtitles"

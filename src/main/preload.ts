@@ -1,10 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+// Definir tipos para la respuesta de guardado
+export interface SaveSettingsResponse {
+  success: boolean
+  error: string | null
+}
+
 // Definir tipos para la API
 export interface ElectronAPI {
   // Configuración
   getSettings: () => Promise<any>
-  saveSettings: (settings: any) => Promise<boolean>
+  saveSettings: (settings: any) => Promise<SaveSettingsResponse>
   
   // Ventana
   hideWindow: () => Promise<void>
@@ -17,9 +23,16 @@ export interface ElectronAPI {
   onNextPauseScheduled: (callback: (time: number) => void) => void
   onStartExercise: (callback: () => void) => void
   onShowSettings: (callback: () => void) => void
-  
+
   // Remover listeners
   removeAllListeners: (channel: string) => void
+
+  // Exponer ipcRenderer para eventos adicionales (actualizaciones)
+  ipcRenderer: {
+    on: (channel: string, callback: (...args: any[]) => void) => void
+    send: (channel: string, ...args: any[]) => void
+    removeAllListeners: (channel: string) => void
+  }
 }
 
 // API expuesta al renderer process
@@ -51,6 +64,19 @@ const electronAPI: ElectronAPI = {
   // Remover listeners
   removeAllListeners: (channel) => {
     ipcRenderer.removeAllListeners(channel)
+  },
+
+  // Exponer ipcRenderer para eventos adicionales
+  ipcRenderer: {
+    on: (channel, callback) => {
+      ipcRenderer.on(channel, callback)
+    },
+    send: (channel, ...args) => {
+      ipcRenderer.send(channel, ...args)
+    },
+    removeAllListeners: (channel) => {
+      ipcRenderer.removeAllListeners(channel)
+    }
   }
 }
 

@@ -34,6 +34,7 @@
     "concurrently": "^8.2.2",
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
+    "terser": "^5.44.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.10"
   },
@@ -48,32 +49,45 @@
     "appId": "pe.edu.unheval.pausas-activas",
     "productName": "Pausas Activas UNHEVAL",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "asar": false,
+    "asar": true,
+    "asarUnpack": [
+      "assets/videos/**/*"
+    ],
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**/*",
       "assets/**/*",
-      "!assets/videos/README.md",
-      "!assets/videos/INSTRUCCIONES_VIDEOS.md",
+      "!assets/**/*.md",
+      "!assets/**/*.txt",
       "node_modules/**/*",
+      "!node_modules/**/{CHANGELOG.md,README.md,readme.md,*.md}",
+      "!node_modules/**/{test,__tests__,tests,powered-test,example,examples}",
+      "!node_modules/**/{*.d.ts.map,*.js.map}",
+      "!node_modules/**/.bin",
       "!node_modules/**/test/**",
-      "!node_modules/**/tests/**"
+      "!node_modules/**/tests/**",
+      "DESINSTALAR-MANUAL.bat",
+      "DONDE-ESTA-INSTALADO.md",
+      "INSTRUCCIONES-INSTALACION.md"
     ],
     "extraResources": [
       {
         "from": "assets",
         "to": "assets",
         "filter": [
-          "**/*"
+          "**/*",
+          "!**/*.md",
+          "!**/*.txt"
         ]
       }
     ],
     "win": {
       "target": "nsis",
       "icon": "build/icons/icon.png",
-      "signAndEditExecutable": false
+      "signAndEditExecutable": false,
+      "artifactName": "${productName}-${version}-Setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -82,7 +96,15 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Pausas Activas UNHEVAL",
       "perMachine": false,
-      "allowElevation": true
+      "allowElevation": true,
+      "license": "LICENSE.txt",
+      "warningsAsErrors": false,
+      "deleteAppDataOnUninstall": false,
+      "menuCategory": "UNHEVAL",
+      "runAfterFinish": true,
+      "include": "build/installer.nsh",
+      "compression": "maximum",
+      "differentialPackage": true
     },
     "publish": {
       "provider": "github",

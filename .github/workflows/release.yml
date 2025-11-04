@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'  # Se ejecuta cuando creas un tag como v1.0.0, v1.0.1, etc.
+  workflow_dispatch: # Permite ejecutar manualmente desde GitHub Actions
 
 jobs:
   release:
@@ -12,27 +13,71 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Obtener todo el historial para generar changelog
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build application
         run: npm run build
 
-      - name: Build installer
-        run: npx electron-builder --win --x64 --publish always
+      - name: Build and publish to GitHub
+        run: npm run dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: instalador-windows
+          name: instalador-windows-${{ github.ref_name }}
           path: |
             release/*.exe
             release/*.yml
+          retention-days: 30
+
+      - name: Create Release Notes
+        id: release_notes
+        run: |
+          echo "## Instalación" >> notes.txt
+          echo "" >> notes.txt
+          echo "1. Descarga el archivo .exe" >> notes.txt
+          echo "2. Ejecuta el instalador" >> notes.txt
+          echo "3. La aplicación se iniciará automáticamente con Windows (configurable)" >> notes.txt
+          echo "4. Las actualizaciones futuras se instalarán automáticamente" >> notes.txt
+          echo "" >> notes.txt
+          echo "## Cambios en esta versión" >> notes.txt
+          echo "" >> notes.txt
+
+          # Obtener el tag anterior de manera segura
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            echo "- Primera versión pública" >> notes.txt
+            echo "- Sistema de recordatorios de pausas activas" >> notes.txt
+            echo "- Reproducción de videos de ejercicios" >> notes.txt
+            echo "- Configuración personalizable de intervalos" >> notes.txt
+            echo "- Inicio automático con Windows" >> notes.txt
+            echo "- Actualizaciones automáticas" >> notes.txt
+          else
+            git log $PREV_TAG..HEAD --pretty=format:"- %s" >> notes.txt || echo "- Actualización de la aplicación" >> notes.txt
+          fi
+
+      - name: Update Release with Notes
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: notes.txt
+          draft: false
+          prerelease: false
+          files: |
+            release/*.exe
+            release/*.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

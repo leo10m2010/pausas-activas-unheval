@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import Player from './components/Player'
 import Controls from './components/Controls'
-import Settings from './components/Settings'
 import Footer from './components/Footer'
 import NextPauseTimer from './components/NextPauseTimer'
+
+// Lazy loading del componente Settings (solo se carga cuando se abre)
+const Settings = lazy(() => import('./components/Settings'))
 
 interface AppSettings {
   interval: number
@@ -32,25 +34,27 @@ const App: React.FC = () => {
 
   // Detectar si estamos en desarrollo o producción
   const basePath = window.location.protocol === 'file:' ? '.' : ''
-  
+
   // Lista de videos por defecto
+  // Soporta múltiples formatos: .mp4, .webm, .ogg
+  // Puedes mezclar formatos en la misma lista
   const defaultVideos = [
     {
       id: 1,
       title: 'Ejercicio 1 - Estiramiento de cuello',
-      src: `${basePath}/videos/ejercicio1.mp4`,
+      src: `${basePath}/videos/ejercicio1.mp4`, // Cambia a .webm si lo prefieres
       subtitles: `${basePath}/subs/ejercicio1.vtt`
     },
     {
       id: 2,
       title: 'Ejercicio 2 - Movimientos de hombros',
-      src: `${basePath}/videos/ejercicio2.mp4`,
+      src: `${basePath}/videos/ejercicio2.mp4`, // Cambia a .webm si lo prefieres
       subtitles: ''
     },
     {
       id: 3,
       title: 'Ejercicio 3 - Estiramiento de espalda',
-      src: `${basePath}/videos/ejercicio3.mp4`,
+      src: `${basePath}/videos/ejercicio3.mp4`, // Cambia a .webm si lo prefieres
       subtitles: ''
     }
   ]
@@ -103,26 +107,38 @@ const App: React.FC = () => {
       switch (event.code) {
         case 'Space':
           event.preventDefault()
-          handlePlayPause()
+          setIsPlaying(prev => !prev)
           break
         case 'ArrowLeft':
           event.preventDefault()
-          handlePrevious()
+          if (settings.playOrder === 'random') {
+            const randomIndex = Math.floor(Math.random() * defaultVideos.length)
+            setCurrentVideoIndex(randomIndex)
+          } else {
+            setCurrentVideoIndex(prev => (prev - 1 + defaultVideos.length) % defaultVideos.length)
+          }
+          setIsPlaying(true)
           break
         case 'ArrowRight':
           event.preventDefault()
-          handleNext()
+          if (settings.playOrder === 'random') {
+            const randomIndex = Math.floor(Math.random() * defaultVideos.length)
+            setCurrentVideoIndex(randomIndex)
+          } else {
+            setCurrentVideoIndex(prev => (prev + 1) % defaultVideos.length)
+          }
+          setIsPlaying(true)
           break
         case 'Escape':
           event.preventDefault()
-          handleHideWindow()
+          window.electronAPI.hideWindow().catch(err => console.error('Error ocultando ventana:', err))
           break
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [currentVideoIndex, isPlaying])
+  }, [settings.playOrder])
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying)
@@ -162,16 +178,20 @@ const App: React.FC = () => {
   }
 
   const handleSettingsSave = async (newSettings: AppSettings) => {
-    try {
-      await window.electronAPI.saveSettings(newSettings)
-      setSettings(newSettings)
-      setShowSettings(false)
-      
-      // Actualizar tiempo de próxima pausa si cambió el intervalo
+    const result = await window.electronAPI.saveSettings(newSettings)
+
+    if (!result.success) {
+      // Propagar el error para que Settings.tsx lo maneje
+      throw new Error(result.error || 'Error al guardar la configuración')
+    }
+
+    // Solo actualizar si guardó correctamente
+    setSettings(newSettings)
+
+    // Actualizar tiempo de próxima pausa si cambió el intervalo
+    if (newSettings.interval !== settings.interval) {
       const nextTime = await window.electronAPI.getNextPauseTime()
       setNextPauseTime(nextTime)
-    } catch (error) {
-      console.error('Error guardando configuración:', error)
     }
   }
 
@@ -191,24 +211,30 @@ const App: React.FC = () => {
       <header className="app-header">
         <div className="header-left">
           <div className="logo-container">
-            <img 
+            <img
               src={`${basePath}/icons/logo-unheval.png`}
               alt="Logo UNHEVAL"
+              className="logo-image"
               onError={(e) => {
                 // Fallback a SVG si PNG no está disponible
                 (e.target as HTMLImageElement).src = `${basePath}/icons/logo-unheval.svg`
               }}
             />
           </div>
-          <h1 className="app-title">Haga una pausa. Pausas Activas.</h1>
+          <div className="header-text">
+            <h1 className="app-title">Pausas Activas</h1>
+            <p className="app-subtitle">Es hora de cuidar tu salud</p>
+          </div>
         </div>
-        <button 
+        <button
           className="close-button"
           onClick={() => window.electronAPI?.hideWindow()}
-          title="Cerrar ventana (Escape)"
-          aria-label="Cerrar"
+          title="Minimizar a bandeja (Escape)"
+          aria-label="Minimizar"
         >
-          ✕
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M12.854 4.854a.5.5 0 0 0-.708-.708L8 8.293 3.854 4.146a.5.5 0 1 0-.708.708L7.293 9l-4.147 4.146a.5.5 0 0 0 .708.708L8 9.707l4.146 4.147a.5.5 0 0 0 .708-.708L8.707 9l4.147-4.146z"/>
+          </svg>
         </button>
       </header>
 
@@ -242,13 +268,21 @@ const App: React.FC = () => {
       {/* Footer institucional */}
       <Footer />
 
-      {/* Modal de configuración */}
+      {/* Modal de configuración con lazy loading */}
       {showSettings && (
-        <Settings
-          settings={settings}
-          onSave={handleSettingsSave}
-          onClose={handleSettingsClose}
-        />
+        <Suspense fallback={
+          <div className="settings-overlay">
+            <div className="settings-modal" style={{ textAlign: 'center', padding: '40px' }}>
+              <p>Cargando configuración...</p>
+            </div>
+          </div>
+        }>
+          <Settings
+            settings={settings}
+            onSave={handleSettingsSave}
+            onClose={handleSettingsClose}
+          />
+        </Suspense>
       )}
     </div>
   )
