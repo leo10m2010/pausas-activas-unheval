@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate ICO icon from PNG
+        run: node generate-icon.js
+
       - name: Build application
         run: npm run build
         env:

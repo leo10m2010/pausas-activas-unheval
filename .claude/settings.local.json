@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(nul)",
+      "Bash(node generate-icon.js:*)"
     ],
     "deny": [],
     "ask": []
