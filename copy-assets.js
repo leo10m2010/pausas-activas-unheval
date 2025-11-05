@@ -55,6 +55,12 @@ try {
     path.join(__dirname, 'dist', 'renderer', 'subs')
   );
 
+  // Copiar sonidos
+  copyRecursive(
+    path.join(__dirname, 'assets', 'sound'),
+    path.join(__dirname, 'dist', 'renderer', 'sound')
+  );
+
   console.log('✓ Assets copiados exitosamente!');
 } catch (error) {
   console.error('✗ Error durante la copia de assets:', error.message);

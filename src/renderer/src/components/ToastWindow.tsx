@@ -11,9 +11,17 @@ const ToastWindow: React.FC<ToastWindowProps> = ({ basePath = '.' }) => {
   const entryTimerRef = React.useRef<NodeJS.Timeout | null>(null)
   const autoDismissTimerRef = React.useRef<NodeJS.Timeout | null>(null)
   const isMountedRef = React.useRef(true)
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     isMountedRef.current = true
+
+    // Reproducir sonido de notificación
+    if (audioRef.current) {
+      audioRef.current.play().catch(error => {
+        console.error('Error reproduciendo sonido de notificación:', error)
+      })
+    }
 
     // Animación de entrada
     entryTimerRef.current = setTimeout(() => {
@@ -163,6 +171,9 @@ const ToastWindow: React.FC<ToastWindowProps> = ({ basePath = '.' }) => {
           <div className="toast-progress-fill"></div>
         </div>
       </div>
+
+      {/* Audio de notificación */}
+      <audio ref={audioRef} src={`${basePath}/sound/noti.mp3`} preload="auto" />
     </div>
   )
 }
