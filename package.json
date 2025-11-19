@@ -1,6 +1,6 @@
 {
   "name": "pausas-activas-unheval",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Aplicación de escritorio para pausas activas - Universidad Nacional Hermilio Valdizán",
   "main": "dist/main/main.js",
   "homepage": "https://unheval.edu.pe",
