@@ -138,6 +138,7 @@ const Player: React.FC<PlayerProps> = ({
       <video
         ref={videoRef}
         className="video-player"
+        preload="none"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={onEnded}
@@ -157,15 +158,15 @@ const Player: React.FC<PlayerProps> = ({
         )}
         Tu navegador no soporta el elemento de video.
       </video>
-      
+
       {/* Información del video y progreso */}
       <div className="progress-container">
         <div className="progress-label">
           {video.title} • {formatTime(currentTime)} / {formatTime(duration)}
         </div>
         <div className="progress-bar">
-          <div 
-            className="progress-fill" 
+          <div
+            className="progress-fill"
             style={{ width: `${progress}%` }}
           />
         </div>

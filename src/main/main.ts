@@ -3,6 +3,14 @@ import { join } from 'path'
 import AutoLaunch from 'auto-launch'
 import Store from 'electron-store'
 import { autoUpdater } from 'electron-updater'
+import log from 'electron-log'
+
+// Configurar logging
+log.initialize()
+log.transports.file.level = 'info'
+log.transports.console.level = 'info'
+// Redirigir console.log a electron-log
+Object.assign(console, log.functions)
 
 // Reemplazar is.dev
 const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev')
@@ -402,7 +410,7 @@ function setupIPC(): void {
       playOrder: store.get('playOrder')
     }
   })
-  
+
   // Guardar configuración
   ipcMain.handle('save-settings', async (event, settings) => {
     try {
@@ -465,24 +473,24 @@ function setupIPC(): void {
       }
     }
   })
-  
+
   // Obtener tiempo hasta próxima pausa
   ipcMain.handle('get-next-pause-time', () => {
     const silentUntil = store.get('silentUntil') as number | null
     if (silentUntil && Date.now() < silentUntil) {
       return silentUntil
     }
-    
+
     // Calcular basado en el timer actual
     const interval = (store.get('interval') as number) * 60 * 1000
     return Date.now() + interval
   })
-  
+
   // Ocultar ventana
   ipcMain.handle('hide-window', () => {
     mainWindow?.hide()
   })
-  
+
   // Mostrar configuración
   ipcMain.handle('show-settings', () => {
     mainWindow?.webContents.send('show-settings')
@@ -518,9 +526,14 @@ function setupIPC(): void {
 
 // Configurar auto-updater events
 function setupAutoUpdater() {
+  // Configurar logger para auto-updater
+  autoUpdater.logger = log
+  // @ts-ignore - electron-updater types mismatch
+  autoUpdater.logger.transports.file.level = 'info'
+
   // Solo verificar actualizaciones en producción
   if (isDev) {
-    console.log('Auto-updater deshabilitado en desarrollo')
+    log.info('Auto-updater deshabilitado en desarrollo')
     return
   }
 
@@ -552,7 +565,7 @@ function setupAutoUpdater() {
   autoUpdater.on('update-available', (info: any) => {
     console.log('Actualización disponible:', info.version)
     mainWindow?.webContents.send('update-available', info)
-    
+
     // Mostrar notificación
     const notification = new Notification({
       title: 'Actualización Disponible',
@@ -560,7 +573,7 @@ function setupAutoUpdater() {
       icon: join(__dirname, '../../assets/icons/logo-unheval.png')
     })
     notification.show()
-    
+
     // Descargar automáticamente
     autoUpdater.downloadUpdate()
   })
@@ -581,7 +594,7 @@ function setupAutoUpdater() {
   autoUpdater.on('update-downloaded', (info: any) => {
     console.log('Actualización descargada:', info.version)
     mainWindow?.webContents.send('update-downloaded', info)
-    
+
     const notification = new Notification({
       title: 'Actualización Lista',
       body: 'La actualización se instalará cuando cierres la aplicación.',

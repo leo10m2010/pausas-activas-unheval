@@ -3,6 +3,7 @@ import Player from './components/Player'
 import Controls from './components/Controls'
 import Footer from './components/Footer'
 import NextPauseTimer from './components/NextPauseTimer'
+import { defaultVideos } from './constants/videos'
 
 // Lazy loading del componente Settings (solo se carga cuando se abre)
 const Settings = lazy(() => import('./components/Settings'))
@@ -35,37 +36,13 @@ const App: React.FC = () => {
   // Detectar si estamos en desarrollo o producción
   const basePath = window.location.protocol === 'file:' ? '.' : ''
 
-  // Lista de videos por defecto
-  // Soporta múltiples formatos: .mp4, .webm, .ogg
-  // Puedes mezclar formatos en la misma lista
-  const defaultVideos = [
-    {
-      id: 1,
-      title: 'Ejercicio 1 - Estiramiento de cuello',
-      src: `${basePath}/videos/ejercicio1.mp4`, // Cambia a .webm si lo prefieres
-      subtitles: `${basePath}/subs/ejercicio1.vtt`
-    },
-    {
-      id: 2,
-      title: 'Ejercicio 2 - Movimientos de hombros',
-      src: `${basePath}/videos/ejercicio2.mp4`, // Cambia a .webm si lo prefieres
-      subtitles: ''
-    },
-    {
-      id: 3,
-      title: 'Ejercicio 3 - Estiramiento de espalda',
-      src: `${basePath}/videos/ejercicio3.mp4`, // Cambia a .webm si lo prefieres
-      subtitles: ''
-    }
-  ]
-
   // Cargar configuración inicial
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const savedSettings = await window.electronAPI.getSettings()
         setSettings(savedSettings)
-        
+
         const nextTime = await window.electronAPI.getNextPauseTime()
         setNextPauseTime(nextTime)
       } catch (error) {
@@ -233,7 +210,7 @@ const App: React.FC = () => {
           aria-label="Minimizar"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M12.854 4.854a.5.5 0 0 0-.708-.708L8 8.293 3.854 4.146a.5.5 0 1 0-.708.708L7.293 9l-4.147 4.146a.5.5 0 0 0 .708.708L8 9.707l4.146 4.147a.5.5 0 0 0 .708-.708L8.707 9l4.147-4.146z"/>
+            <path d="M12.854 4.854a.5.5 0 0 0-.708-.708L8 8.293 3.854 4.146a.5.5 0 1 0-.708.708L7.293 9l-4.147 4.146a.5.5 0 0 0 .708.708L8 9.707l4.146 4.147a.5.5 0 0 0 .708-.708L8.707 9l4.147-4.146z" />
           </svg>
         </button>
       </header>
